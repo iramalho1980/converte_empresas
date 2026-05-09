@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GERENCIADOR | THOMSON REUTERS - IMPLANTAÇÃO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(to right, #3d72b4, #525252);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-color: #ffffff;
+            --shadow-blur: 3px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Open Sans', sans-serif;
+            font-size: 11px;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #1a1a1a;
+            overflow: hidden;
+            color: var(--text-color);
+        }
+
+        .glow-text {
+            text-shadow: 0 0 var(--shadow-blur) rgba(255,255,255,0.6);
+        }
+
+        /* Smartphone Container */
+        .phone-wrapper {
+            position: relative;
+            width: 390px;
+            height: 844px;
+            max-height: 95vh;
+            background: var(--bg-gradient);
+            transition: background 0.5s ease;
+            border-radius: 45px;
+            box-shadow: 0 0 0 12px #333, 0 30px 60px rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 5;
+        }
+
+        .dynamic-island {
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 110px;
+            height: 25px;
+            background: #000;
+            border-radius: 20px;
+            z-index: 20;
+        }
+
+        header {
+            padding: 45px 20px 15px 20px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--glass-border);
+            text-align: center;
+            z-index: 10;
+        }
+
+        header h1 {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-y: auto;
+            scrollbar-width: none;
+        }
+
+        .main-content::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Dashboard */
+        .dashboard-box {
+            margin: 30px 0 50px 0;
+        }
+
+        .spinner-widget {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .ring-anim {
+            position: absolute;
+            width: 90%;
+            height: 90%;
+            border: 2px solid transparent;
+            border-top: 2px solid rgba(255,255,255,0.6);
+            border-right: 2px solid rgba(255,255,255,0.2);
+            border-radius: 50%;
+            animation: spin 3s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .info-center {
+            text-align: center;
+            z-index: 2;
+        }
+
+        .info-center h2 {
+            font-size: 28px;
+            font-weight: 300;
+        }
+
+        /* Cards */
+        .cards-stack {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card-top {
+            padding: 14px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .card-top span {
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-body {
+            max-height: 0;
+            opacity: 0;
+            padding: 0 18px;
+            transition: all 0.4s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .glass-card.active {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .glass-card.active .card-body {
+            max-height: 500px;
+            opacity: 1;
+            padding: 5px 18px 18px 18px;
+        }
+
+        .glass-card.active .fa-chevron-down {
+            transform: rotate(180deg);
+        }
+
+        .action-link {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            color: white;
+            padding: 10px 12px;
+            border-radius: 10px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .action-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+
+        /* Apple Dock */
+        .dock-bar {
+            margin: 20px auto;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 12px 25px;
+            border-radius: 30px;
+            display: flex;
+            gap: 35px; /* Aumentado o gap para compensar a remoção de um ícone */
+            z-index: 100;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .dock-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-size: 18px;
+        }
+
+        .dock-btn:hover {
+            transform: scale(1.3) translateY(-10px);
+            background: rgba(255,255,255,0.4);
+        }
+
+        /* Skin Panel */
+        .skin-selector {
+            position: absolute;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(15px);
+            padding: 12px;
+            border-radius: 20px;
+            display: none;
+            gap: 12px;
+            z-index: 101;
+            border: 1px solid rgba(255,255,255,0.1);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .skin-selector.show {
+            display: flex;
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .skin-dot {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid rgba(255,255,255,0.5);
+            transition: transform 0.2s;
+        }
+
+        /* Popup Modal - FULL SCREEN */
+        .full-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(15px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .full-modal-box {
+            width: 95%;
+            height: 92%;
+            background: #fff;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 50px 100px rgba(0,0,0,0.5);
+        }
+
+        .modal-header {
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            background: #fcfcfc;
+            color: #333;
+        }
+
+        .modal-header h3 {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .modal-close-btn {
+            cursor: pointer;
+            font-size: 24px;
+            color: #999;
+            transition: color 0.2s;
+        }
+
+        .modal-close-btn:hover {
+            color: #333;
+        }
+
+        iframe {
+            flex: 1;
+            border: none;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Loading Overlay */
+        .phone-loader {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(20px);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .ring-loader {
+            width: 70px;
+            height: 70px;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top: 4px solid #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .percent-text {
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="phone-wrapper" id="phoneBody">
+        <div class="dynamic-island"></div>
+        
+        <header>
+            <h1 class="glow-text">GERENCIADOR | THOMSON REUTERS - IMPLANTAÇÃO</h1>
+        </header>
+
+        <div class="main-content">
+            <div class="dashboard-box">
+                <div class="spinner-widget">
+                    <div class="ring-anim"></div>
+                    <div class="info-center glow-text">
+                        <h2>92%</h2>
+                        <div style="font-size: 10px; opacity: 0.8; text-transform: uppercase;">Eficiência</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cards-stack">
+                <div class="glass-card" id="cardConversores">
+                    <div class="card-top" onclick="toggleCard('cardConversores')">
+                        <span class="glow-text"><i class="fas fa-sync-alt"></i> CONVERSORES</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="card-body" id="conversoresContainer"></div>
+                </div>
+            </div>
+
+            <footer class="dock-bar">
+                <div class="dock-btn" onclick="toggleSkinSelector()" title="Temas">
+                    <i class="fas fa-swatchbook"></i>
+                </div>
+                <div class="dock-btn" onclick="location.reload()" title="Início">
+                    <i class="fas fa-th-large"></i>
+                </div>
+            </footer>
+        </div>
+
+        <!-- Skin Selector -->
+        <div class="skin-selector" id="skinPanel">
+            <div class="skin-dot" style="background: linear-gradient(to right, #3d72b4, #525252);" onclick="setTheme(0)"></div>
+            <div class="skin-dot" style="background: linear-gradient(to right, #19547b, #ffd89b);" onclick="setTheme(1)"></div>
+            <div class="skin-dot" style="background: linear-gradient(to right, #99f2c8, #1f4037);" onclick="setTheme(2)"></div>
+            <div class="skin-dot" style="background: linear-gradient(to right, #FD746C, #2C3E50);" onclick="setTheme(3)"></div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay" class="phone-loader">
+            <div class="ring-loader"></div>
+            <div id="loadPercent" class="percent-text">0%</div>
+            <div class="glow-text" style="margin-top: 5px; opacity: 0.6;">PROCESSANDO...</div>
+        </div>
+    </div>
+
+    <!-- Popup Modal -->
+    <div id="fullModal" class="full-modal-overlay">
+        <div class="full-modal-box">
+            <div class="modal-header">
+                <h3 id="modalTitle"></h3>
+                <i class="fas fa-times modal-close-btn" onclick="closeFullModal()"></i>
+            </div>
+            <iframe id="modalIframe" src=""></iframe>
+        </div>
+    </div>
+
+    <script>
+        /* 
+        ==========================================================================
+        CONFIGURAÇÃO DE CONVERSORES
+        ==========================================================================
+        */
+        const listaConversores = [
+            { 
+                nome: "CADASTRO DE EMPRESAS", 
+                link: "https://insightsenseivan.github.io/converteEmpresas/", 
+                icone: "fas fa-university" 
+            },
+            { 
+                nome: "RBT12 + FOLHA", 
+                link: "https://iramalho1980.github.io/importaRBT12/", 
+                icone: "fas fa-file-invoice" 
+            },
+
+            { 
+                nome: "IMPORTA | SPED ECD - LANCTOS CONTÁBEIS", 
+                link: "https://trramalho.github.io/converte_ECD/", 
+                icone: "fas fa-file-invoice2" 
+            },
+
+            { 
+                nome: "IMPORTA | CADASTRO - FORNCEDORES", 
+                link: "https://iramalho1980.github.io/converte_cliente_fornecedor/", 
+                icone: "fas fa-file-invoice3" 
+            },
+
+              { 
+                nome: "IMPORTA | CADASTRO - PRODUTOS", 
+                link: "https://iramalho1980.github.io/importa_cad_produtos/", 
+                icone: "fas fa-file-invoice4" 
+            },
+
+            { 
+                nome: "IMPORTA | CADASTRO - BENS (PATRIMÔNIO)", 
+                link: "https://iramalho1980.github.io/importa_bens/", 
+                icone: "fas fa-file-invoice5" 
+            }
+        ];
+
+        function renderizarConversores() {
+            const container = document.getElementById('conversoresContainer');
+            container.innerHTML = '';
+            listaConversores.forEach(conv => {
+                const btn = document.createElement('div');
+                btn.className = 'action-link';
+                btn.innerHTML = `<i class="${conv.icone}"></i> ${conv.nome}`;
+                btn.onclick = () => startLoading(conv.link, conv.nome);
+                container.appendChild(btn);
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', renderizarConversores);
+
+        /* 
+        ==========================================================================
+        LÓGICA DO SISTEMA
+        ==========================================================================
+        */
+
+        const themes = [
+            "linear-gradient(to right, #3d72b4, #525252)",
+            "linear-gradient(to right, #19547b, #ffd89b)",
+            "linear-gradient(to right, #99f2c8, #1f4037)",
+            "linear-gradient(to right, #FD746C, #2C3E50)"
+        ];
+
+        function toggleCard(id) {
+            const card = document.getElementById(id);
+            const wasActive = card.classList.contains('active');
+            document.querySelectorAll('.glass-card').forEach(c => c.classList.remove('active'));
+            if (!wasActive) card.classList.add('active');
+        }
+
+        function toggleSkinSelector() {
+            const panel = document.getElementById('skinPanel');
+            if (panel.classList.contains('show')) {
+                panel.classList.remove('show');
+                setTimeout(() => panel.style.display = 'none', 300);
+            } else {
+                panel.style.display = 'flex';
+                setTimeout(() => panel.classList.add('show'), 10);
+            }
+        }
+
+        function setTheme(index) {
+            const gradient = themes[index];
+            document.getElementById('phoneBody').style.background = gradient;
+            localStorage.setItem('tr_theme_idx', index);
+            toggleSkinSelector();
+        }
+
+        function startLoading(url, title) {
+            const overlay = document.getElementById('loadingOverlay');
+            const percentDisplay = document.getElementById('loadPercent');
+            overlay.style.display = 'flex';
+            let current = 0;
+            const step = () => {
+                current += Math.floor(Math.random() * 15) + 5;
+                if (current >= 100) {
+                    current = 100;
+                    percentDisplay.innerText = '100%';
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                        openFullModal(url, title);
+                    }, 400);
+                } else {
+                    percentDisplay.innerText = current + '%';
+                    setTimeout(step, 120);
+                }
+            };
+            step();
+        }
+
+        function openFullModal(url, title) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalIframe').src = url;
+            document.getElementById('fullModal').style.display = 'flex';
+        }
+
+        function closeFullModal() {
+            document.getElementById('fullModal').style.display = 'none';
+            document.getElementById('modalIframe').src = '';
+        }
+
+        window.onload = () => {
+            const saved = localStorage.getItem('tr_theme_idx');
+            if (saved !== null) {
+                setTheme(parseInt(saved));
+                document.getElementById('skinPanel').classList.remove('show');
+                document.getElementById('skinPanel').style.display = 'none';
+            }
+            
+            // Garantir que os cards comecem colapsados (removendo qualquer classe active residual)
+            document.querySelectorAll('.glass-card').forEach(c => c.classList.remove('active'));
+        };
+
+        window.addEventListener('click', (e) => {
+            if (!e.target.closest('.dock-btn') && !e.target.closest('.skin-selector')) {
+                const panel = document.getElementById('skinPanel');
+                if (panel.classList.contains('show')) {
+                    panel.classList.remove('show');
+                    setTimeout(() => panel.style.display = 'none', 300);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
